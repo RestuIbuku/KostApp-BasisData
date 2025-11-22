@@ -1,31 +1,249 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kost App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>@yield('title', 'Kost App')</title>
+
+    {{-- Font Awesome & Google Fonts --}}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    {{-- Bootstrap CSS --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --primary-hover: #5a52d5;
+            --secondary-color: #FF6584;
+            --text-dark: #2D3436;
+            --text-muted: #636e72;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--text-dark);
+        }
+
+        /* --- Animated Background Blobs --- */
+        .background-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            filter: blur(60px);
+            opacity: 0.5;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+
+        .shape-1 {
+            top: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            background: var(--primary-color);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        }
+
+        .shape-2 {
+            bottom: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: var(--secondary-color);
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(30px, 50px) rotate(10deg); }
+        }
+
+        /* --- Glass Navbar --- */
+        .navbar-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- Main Content Wrapper --- */
+        .main-wrapper {
+            padding-top: 100px; /* Compensate fixed navbar */
+            padding-bottom: 4rem;
+        }
+
+        /* --- Glass Cards (Global Style) --- */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
+        }
+
+        /* --- Buttons & Links --- */
+        .btn-primary-gradient {
+            background: linear-gradient(135deg, var(--primary-color), #5a52d5);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+            color: white;
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 25px;
+            border-radius: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Animation Utility */
+        .animate-fade-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Delays */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-wrapper { padding-top: 120px; }
+        }
+    </style>
+
+    @stack('styles')
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+    {{-- Background Blobs --}}
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+
+    {{-- Navbar --}}
+    <nav class="navbar navbar-expand-lg navbar-glass fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">Kost App</a>
-            @auth
-            <div class="navbar-nav">
-                @if(Auth::user()->role == 'pemilik')
-                    <a class="nav-link" href="{{ route('kost.index') }}">Kelola Kost</a>
-                @endif
-                <span class="nav-link">{{ Auth::user()->nama_lengkap }}</span>
-                <a href="{{ route('logout') }}" class="nav-link">Logout</a>
+            <a class="navbar-brand brand-text" href="{{ route('home') }}">
+                <i class="fas fa-house-user me-2"></i>KostApp
+            </a>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    @auth
+                        <div class="dropdown">
+                            <button class="btn border-0 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 35px; height: 35px; color: var(--primary-color); font-weight: bold;">
+                                    {{ substr(Auth::user()->nama_lengkap, 0, 1) }}
+                                </div>
+                                <span class="d-none d-md-block fw-medium small">{{ Str::limit(Auth::user()->nama_lengkap, 10) }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 mt-2 p-2" style="background: rgba(255,255,255,0.95);">
+                                <li><h6 class="dropdown-header text-muted">Akun Saya</h6></li>
+                                <li><a class="dropdown-item rounded-3" href="{{ route('profile') }}"><i class="fas fa-user me-2 text-primary"></i> Profil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item rounded-3 text-danger" href="{{ route('logout') }}" onclick="return confirm('Logout sekarang?')"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-primary-gradient btn-sm px-4">Masuk</a>
+                    @endauth
+                </div>
             </div>
-            @endauth
         </div>
     </nav>
 
-    <main class="py-4">
-        @yield('content')
-    </main>
+    {{-- Main Content --}}
+    <div class="main-wrapper">
+        <div class="container">
+            {{-- Alert --}}
+            @if(session('success'))
+                <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 animate-fade-up" style="background: #d1e7dd; color: #0f5132;">
+                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                </div>
+            @endif
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+            @if(session('error'))
+                <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-4 animate-fade-up" style="background: #f8d7da; color: #721c24;">
+                    <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
+                </div>
+            @endif
+
+            @yield('content')
+        </div>
+    </div>
+
+    {{-- Bootstrap JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    @stack('scripts')
 </body>
 </html>

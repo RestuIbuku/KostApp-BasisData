@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Kos extends Model
 {
@@ -14,9 +15,12 @@ class Kos extends Model
         'nama_kos',
         'alamat',
         'deskripsi',
+        'foto',
         'tipe_kos',
         'latitude',
-        'longitude'
+        'longitude',
+        'jumlah_kamar_kosong',
+        'jumlah_kamar_total'
     ];
 
     public function pemilik()

@@ -62,4 +62,22 @@ class AuthController extends Controller
         Auth::logout();
         return redirect('/login');
     }
+
+    public function showProfile()
+    {
+        return view('profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validatedData = $request->validate([
+            'nama_lengkap' => 'required|string|max:100',
+            'email' => 'required|string|email|max:100|unique:users,email,' . Auth::id() . ',user_id',
+            'no_hp' => 'required|string|max:15',
+        ]);
+
+        Auth::user()->update($validatedData);
+
+        return back()->with('success', 'Profil berhasil diperbarui');
+    }
 }
