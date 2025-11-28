@@ -52,6 +52,34 @@ Route::middleware(['auth'])->group(function () {
     // Route buat Pencari (Katalog & Detail)
     Route::get('/jelajah', [PencariController::class, 'index'])->name('pencari.index');
     Route::get('/jelajah/{id}', [PencariController::class, 'show'])->name('pencari.show');
+    Route::get('/pencari/dashboard', [PencariController::class, 'dashboard'])->name('pencari.dashboard');
+
+    // Booking & Pembayaran untuk Pencari
+    Route::get('/booking/{kamar_id}', [\App\Http\Controllers\BookingController::class, 'create'])->name('booking.create');
+    Route::post('/booking', [\App\Http\Controllers\BookingController::class, 'store'])->name('booking.store');
+
+    Route::get('/booking/{booking_id}/bayar', [\App\Http\Controllers\PembayaranController::class, 'create'])->name('pembayaran.create');
+    Route::post('/booking/{booking_id}/bayar', [\App\Http\Controllers\PembayaranController::class, 'store'])->name('pembayaran.store');
+
+    // Ulasan
+    Route::post('/ulasan', [\App\Http\Controllers\UlasanController::class, 'store'])->name('ulasan.store');
+
+    // Route untuk Kamar (nested dengan kost)
+    Route::get('/kost/{kos_id}/kamar', [\App\Http\Controllers\KamarController::class, 'index'])->name('pemilik.kamar.index');
+    Route::get('/kost/{kos_id}/kamar/create', [\App\Http\Controllers\KamarController::class, 'create'])->name('pemilik.kamar.create');
+    Route::post('/kost/{kos_id}/kamar', [\App\Http\Controllers\KamarController::class, 'store'])->name('pemilik.kamar.store');
+    Route::get('/kost/{kos_id}/kamar/{kamar_id}/edit', [\App\Http\Controllers\KamarController::class, 'edit'])->name('pemilik.kamar.edit');
+    Route::put('/kost/{kos_id}/kamar/{kamar_id}', [\App\Http\Controllers\KamarController::class, 'update'])->name('pemilik.kamar.update');
+    Route::delete('/kost/{kos_id}/kamar/{kamar_id}', [\App\Http\Controllers\KamarController::class, 'destroy'])->name('pemilik.kamar.destroy');
+
+    // Route untuk Foto Kamar
+    Route::post('/kost/{kos_id}/kamar/{kamar_id}/foto', [\App\Http\Controllers\FotoKamarController::class, 'store'])->name('pemilik.foto.store');
+    Route::delete('/foto/{foto_id}', [\App\Http\Controllers\FotoKamarController::class, 'destroy'])->name('pemilik.foto.destroy');
+
+    // Route untuk Fasilitas Kos
+    Route::get('/kost/{kos_id}/fasilitas', [\App\Http\Controllers\FasilitasController::class, 'index'])->name('pemilik.fasilitas.index');
+    Route::post('/kost/{kos_id}/fasilitas/attach', [\App\Http\Controllers\FasilitasController::class, 'attach'])->name('pemilik.fasilitas.attach');
+    Route::delete('/kost/{kos_id}/fasilitas/{fasilitas_id}', [\App\Http\Controllers\FasilitasController::class, 'detach'])->name('pemilik.fasilitas.detach');
 });
 // ... kode route yang lain biarkan di atas ...
 
@@ -59,7 +87,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/cek-foto', function () {
     // 1. Ambil data kost paling baru
     $kost = \App\Models\Kos::latest()->first();
-    
+
     if(!$kost) {
         return "Belum ada data kost! Input dulu satu data baru sebagai Pemilik.";
     }

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 
 class AuthController extends Controller
 {
@@ -32,7 +33,7 @@ class AuthController extends Controller
         $user = User::create([
             'nama_lengkap' => $validatedData['nama_lengkap'],
             'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
+            'password' => $validatedData['password'], // will be hashed by User mutator into password_hash
             'no_hp' => $validatedData['no_hp'],
             'role' => $validatedData['role']
         ]);
@@ -76,7 +77,11 @@ class AuthController extends Controller
             'no_hp' => 'required|string|max:15',
         ]);
 
-        Auth::user()->update($validatedData);
+        /** @var User $user */
+        $user = Auth::user();
+        if ($user) {
+            $user->update($validatedData);
+        }
 
         return back()->with('success', 'Profil berhasil diperbarui');
     }

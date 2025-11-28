@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('kos', function (Blueprint $table) {
-            $table->integer('jumlah_kamar_total')->default(0)->after('longitude');
+        Schema::create('fasilitas', function (Blueprint $table) {
+            $table->id('fasilitas_id');
+            $table->string('nama_fasilitas', 100)->unique();
+            $table->enum('tipe', ['kamar', 'umum']);
         });
     }
 
@@ -21,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('kos', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('fasilitas');
     }
 };

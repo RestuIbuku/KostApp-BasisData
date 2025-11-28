@@ -9,14 +9,19 @@ return new class extends Migration
     {
         Schema::create('kos', function (Blueprint $table) {
             $table->id('kos_id');
-            $table->foreignId('pemilik_id')->constrained('users', 'user_id');
+            $table->unsignedBigInteger('pemilik_id');
             $table->string('nama_kos', 150);
             $table->text('alamat');
             $table->text('deskripsi');
             $table->enum('tipe_kos', ['putra', 'putri', 'campur']);
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
-            $table->timestamps();
+            $table->string('foto')->nullable();
+            $table->integer('jumlah_kamar_total')->default(0);
+            $table->integer('jumlah_kamar_kosong')->default(0);
+            $table->timestamp('created_at')->useCurrent();
+
+            $table->foreign('pemilik_id')->references('user_id')->on('users')->onDelete('cascade');
         });
     }
 
