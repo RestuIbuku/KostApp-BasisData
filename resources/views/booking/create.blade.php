@@ -33,7 +33,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('booking.store') }}">
+                <form method="POST" action="{{ route('pencari.booking.store') }}">
                     @csrf
                     <input type="hidden" name="kamar_id" value="{{ $kamar->kamar_id }}">
 

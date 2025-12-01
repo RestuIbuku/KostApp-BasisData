@@ -251,10 +251,10 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    
+
                     {{-- TOMBOL KEMBALI --}}
                     <div class="mb-3">
-                        <a href="{{ route('kost.index') }}" class="btn-back">
+                        <a href="{{ route('pemilik.kos.index') }}" class="btn-back">
                             <i class="fas fa-arrow-left"></i> Kembali ke Daftar
                         </a>
                     </div>
@@ -272,9 +272,9 @@
                         </div>
 
                         <div class="card-body p-4">
-                            <form action="{{ route('kost.store') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('pemilik.kos.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                
+
                                 <div class="row">
                                     {{-- KOLOM KIRI --}}
                                     <div class="col-md-6 mb-3">
@@ -366,7 +366,7 @@
 
                                 {{-- TOMBOL AKSI --}}
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('kost.index') }}" class="btn btn-cancel">Batal</a>
+                                    <a href="{{ route('pemilik.kos.index') }}" class="btn btn-cancel">Batal</a>
                                     <button type="submit" class="btn btn-save">
                                         <i class="fas fa-check-circle me-2"></i> Simpan Data
                                     </button>
@@ -394,7 +394,7 @@
             }
         }
     </script>
-    
+
     {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

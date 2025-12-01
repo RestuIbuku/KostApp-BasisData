@@ -4,7 +4,6 @@
 
 @section('content')
 
-
     {{-- Main Content --}}
     <div class="explore-wrapper">
         <div class="container">
@@ -13,7 +12,39 @@
                 <p>Temukan tempat hunian nyaman impianmu</p>
             </div>
 
-            {{-- Category Filter --}}
+            {{-- Search & Filter Form --}}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('pencari.index') }}" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="nama" class="form-label">Nama Kost</label>
+                            <input type="text" class="form-control" id="nama" name="nama" placeholder="Cari nama kost..." value="{{ request('nama') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipe" class="form-label">Tipe Kost</label>
+                            <select class="form-select" id="tipe" name="tipe">
+                                <option value="">-- Pilih Tipe --</option>
+                                <option value="putra" {{ request('tipe') == 'putra' ? 'selected' : '' }}>Putra</option>
+                                <option value="putri" {{ request('tipe') == 'putri' ? 'selected' : '' }}>Putri</option>
+                                <option value="campur" {{ request('tipe') == 'campur' ? 'selected' : '' }}>Campur</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="min_harga" class="form-label">Min. Harga</label>
+                            <input type="number" class="form-control" id="min_harga" name="min_harga" placeholder="Min..." value="{{ request('min_harga') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="max_harga" class="form-label">Max. Harga</label>
+                            <input type="number" class="form-control" id="max_harga" name="max_harga" placeholder="Max..." value="{{ request('max_harga') }}">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Cari</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- Category Filter Buttons --}}
             <div class="filter-container">
                 <button class="filter-btn active" data-filter="all">Semua</button>
                 <button class="filter-btn" data-filter="putra">
@@ -71,6 +102,16 @@
                             <p class="kost-description">
                                 {{ Str::limit($kost->deskripsi, 90) }}
                             </p>
+
+                            @php
+                                $minHarga = $kost->kamar->min('harga_per_malam');
+                            @endphp
+                            @if ($minHarga)
+                            <div class="kost-price">
+                                <span class="text-muted">Mulai dari</span>
+                                <strong>Rp {{ number_format($minHarga, 0, ',', '.') }}/malam</strong>
+                            </div>
+                            @endif
                         </div>
 
                         <div class="kost-footer">
@@ -108,6 +149,13 @@
                 </div>
 
             </div>
+
+            {{-- Pagination --}}
+            @if ($kosts->hasPages())
+            <div class="d-flex justify-content-center mt-5">
+                {{ $kosts->links() }}
+            </div>
+            @endif
         </div>
     </div>
 

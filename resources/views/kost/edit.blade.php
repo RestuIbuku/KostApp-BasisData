@@ -251,10 +251,10 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    
+
                     {{-- TOMBOL KEMBALI --}}
                     <div class="mb-3">
-                        <a href="{{ route('kost.index') }}" class="btn-back">
+                        <a href="{{ route('pemilik.kos.index') }}" class="btn-back">
                             <i class="fas fa-arrow-left"></i> Kembali ke Daftar
                         </a>
                     </div>
@@ -272,10 +272,10 @@
                         </div>
 
                         <div class="card-body p-4">
-                            <form action="{{ route('kost.update', $kost->kos_id) }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('pemilik.kos.update', $kost->kos_id) }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
-                                
+
                                 <div class="row">
                                     {{-- KOLOM KIRI --}}
                                     <div class="col-md-6 mb-3">
@@ -303,7 +303,7 @@
                                     {{-- KOLOM KANAN (FOTO UPLOAD) --}}
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label-custom"><i class="fas fa-image" style="color: #00b894;"></i> Foto Kost</label>
-                                        
+
                                         {{-- Preview Foto Lama (Jika Ada) --}}
                                         @if($kost->foto)
                                             <div class="mb-2 d-flex align-items-center gap-2">
@@ -376,7 +376,7 @@
 
                                 {{-- TOMBOL AKSI --}}
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('kost.index') }}" class="btn btn-cancel">Batal</a>
+                                    <a href="{{ route('pemilik.kos.index') }}" class="btn btn-cancel">Batal</a>
                                     <button type="submit" class="btn btn-save">
                                         <i class="fas fa-save me-2"></i> Update Data
                                     </button>
@@ -399,11 +399,11 @@
                 document.getElementById('fileName').innerText = file.name;
                 var icon = document.querySelector('.upload-icon');
                 icon.className = 'fas fa-check-circle upload-icon';
-                icon.style.color = '#10b981'; 
+                icon.style.color = '#10b981';
             }
         }
     </script>
-    
+
     {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

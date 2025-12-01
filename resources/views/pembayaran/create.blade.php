@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('pembayaran.store', $booking->booking_id) }}">
+                <form method="POST" action="{{ route('pencari.pembayaran.store', $booking->booking_id) }}">
                     @csrf
 
                     <div class="mb-3">

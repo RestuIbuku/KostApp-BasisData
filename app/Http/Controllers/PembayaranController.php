@@ -65,11 +65,17 @@ class PembayaranController extends Controller
             return redirect()->back()->with('error', 'Booking ini sudah dibayar.');
         }
 
+        // Ensure jumlah is positive
+        $jumlah = floatval($data['jumlah']);
+        if ($jumlah <= 0) {
+            return redirect()->back()->with('error', 'Jumlah pembayaran harus lebih besar dari 0.');
+        }
+
         // Create or update payment record
         $pembayaran = Pembayaran::updateOrCreate(
             ['booking_id' => $booking->booking_id],
             [
-                'jumlah' => $data['jumlah'],
+                'jumlah' => $jumlah,
                 'metode_pembayaran' => $this->paymentMethods[$data['metode_pembayaran']] ?? $data['metode_pembayaran'],
                 'status_pembayaran' => 'paid',
                 'tgl_pembayaran' => now(),
@@ -95,7 +101,7 @@ class PembayaranController extends Controller
             abort(403);
         }
 
-        return view('pembayaran.confirmation', compact('booking'));
+        return view('pencari.pembayaran.confirmation', compact('booking'));
     }
 
     /**

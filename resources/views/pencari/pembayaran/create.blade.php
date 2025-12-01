@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('pembayaran.store', $booking->booking_id) }}">
+                <form method="POST" action="{{ route('pencari.pembayaran.store', $booking->booking_id) }}">
                     @csrf
 
                     <div class="mb-3">
@@ -47,7 +47,7 @@
 
                     <div class="mb-3">
                         <label for="jumlah" class="form-label">Jumlah Pembayaran</label>
-                        <input type="number" id="jumlah" name="jumlah" class="form-control" value="{{ $booking->total_harga }}" readonly>
+                        <input type="number" id="jumlah" name="jumlah" class="form-control" value="{{ $booking->total_harga }}" step="0.01" min="{{ $booking->total_harga }}" required>
                     </div>
 
                     <div class="alert alert-warning">

@@ -151,7 +151,7 @@
                                                         </div>
                                                         @if($kamar->status_ketersediaan === 'tersedia')
                                                             @auth
-                                                            <a href="{{ route('booking.create', $kamar->kamar_id) }}" class="btn-booking-kamar">
+                                                            <a href="{{ route('pencari.booking.create', $kamar->kamar_id) }}" class="btn-booking-kamar">
                                                                 Booking
                                                             </a>
                                                             @else

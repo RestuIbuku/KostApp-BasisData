@@ -258,7 +258,7 @@
                     </div>
 
                     {{-- Upload Foto Form --}}
-                    <form method="POST" action="{{ route('pemilik.foto.store', [$kos->kos_id, $kamar->kamar_id]) }}" enctype="multipart/form-data" class="mb-4">
+                    <form method="POST" action="{{ route('pemilik.foto-kamar.store', [$kos->kos_id, $kamar->kamar_id]) }}" enctype="multipart/form-data" class="mb-4">
                         @csrf
                         <div class="row">
                             <div class="col-md-8 mb-3">
@@ -289,7 +289,7 @@
                             @foreach($kamar->fotoKamar as $foto)
                             <div class="foto-item">
                                 <img src="{{ asset('storage/' . $foto->url_foto) }}" alt="Foto">
-                                <form method="POST" action="{{ route('pemilik.foto.destroy', $foto->foto_id) }}" style="display: inline;" onsubmit="return confirm('Hapus foto ini?')">
+                                <form method="POST" action="{{ route('pemilik.foto-kamar.destroy', $foto->foto_id) }}" style="display: inline;" onsubmit="return confirm('Hapus foto ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="foto-delete" title="Hapus">

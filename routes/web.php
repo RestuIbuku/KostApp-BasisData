@@ -91,7 +91,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [PemilikController::class, 'dashboard'])->name('dashboard');
 
         // CRUD Kos
-        Route::resource('kos', KostController::class);
+        Route::get('/kos', [KostController::class, 'index'])->name('kos.index');
+        Route::get('/kos/create', [KostController::class, 'create'])->name('kos.create');
+        Route::post('/kos', [KostController::class, 'store'])->name('kos.store');
+        Route::get('/kos/{kos_id}/edit', [KostController::class, 'edit'])->name('kos.edit');
+        Route::put('/kos/{kos_id}', [KostController::class, 'update'])->name('kos.update');
+        Route::delete('/kos/{kos_id}', [KostController::class, 'destroy'])->name('kos.destroy');
 
         // Kamar Management (Nested routes)
         Route::get('/kos/{kos_id}/kamar', [KamarController::class, 'index'])->name('kamar.index');
@@ -103,8 +108,8 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/kamar/{kamar_id}/status', [KamarController::class, 'updateStatus'])->name('kamar.updateStatus');
 
         // Foto Kamar Management
-        Route::post('/kos/{kos_id}/kamar/{kamar_id}/foto', [FotoKamarController::class, 'store'])->name('foto.store');
-        Route::delete('/foto/{foto_id}', [FotoKamarController::class, 'destroy'])->name('foto.destroy');
+        Route::post('/kos/{kos_id}/kamar/{kamar_id}/foto', [FotoKamarController::class, 'store'])->name('foto-kamar.store');
+        Route::delete('/foto/{foto_id}', [FotoKamarController::class, 'destroy'])->name('foto-kamar.destroy');
 
         // Fasilitas Management
         Route::get('/kos/{kos_id}/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas.index');

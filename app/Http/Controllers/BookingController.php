@@ -126,7 +126,7 @@ class BookingController extends Controller
             'created_at' => now(),
         ]);
 
-        return redirect()->route('pembayaran.create', $booking->booking_id)
+        return redirect()->route('pencari.pembayaran.create', $booking->booking_id)
             ->with('success', 'Booking berhasil dibuat. Silakan lanjutkan ke pembayaran.');
     }
 
