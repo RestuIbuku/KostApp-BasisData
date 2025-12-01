@@ -197,7 +197,36 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="ms-auto d-flex align-items-center gap-3">
+                <ul class="navbar-nav me-auto">
+                    @auth
+                        @if(Auth::user()->role == 'pemilik')
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="pemilikMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-building me-1"></i> Manajemen
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-lg rounded-3" aria-labelledby="pemilikMenu" style="background: rgba(255,255,255,0.95);">
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pemilik.dashboard') }}"><i class="fas fa-chart-line me-2 text-primary"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pemilik.kos.index') }}"><i class="fas fa-house-user me-2 text-info"></i> Manajemen Kos</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pemilik.bookings.index') }}"><i class="fas fa-calendar-check me-2 text-warning"></i> Booking Masuk</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pemilik.reviews.index') }}"><i class="fas fa-star me-2 text-warning"></i> Ulasan</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pemilik.pembayaran.index') }}"><i class="fas fa-credit-card me-2 text-success"></i> Pembayaran</a></li>
+                                </ul>
+                            </li>
+                        @elseif(Auth::user()->role == 'pencari')
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="pencariMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-search me-1"></i> Pencarian
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-lg rounded-3" aria-labelledby="pencariMenu" style="background: rgba(255,255,255,0.95);">
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pencari.index') }}"><i class="fas fa-home me-2 text-info"></i> Jelajahi Kos</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pencari.dashboard') }}"><i class="fas fa-chart-line me-2 text-primary"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="{{ route('pencari.bookings.my') }}"><i class="fas fa-bookmark me-2 text-warning"></i> Booking Saya</a></li>
+                                </ul>
+                            </li>
+                        @endif
+                    @endauth
+                </ul>
+                <div class="d-flex align-items-center gap-3">
                     @auth
                         <div class="dropdown">
                             <button class="btn border-0 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
@@ -210,7 +239,14 @@
                                 <li><h6 class="dropdown-header text-muted">Akun Saya</h6></li>
                                 <li><a class="dropdown-item rounded-3" href="{{ route('profile') }}"><i class="fas fa-user me-2 text-primary"></i> Profil</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item rounded-3 text-danger" href="{{ route('logout') }}" onclick="return confirm('Logout sekarang?')"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item rounded-3 text-danger w-100 text-start" style="border: none; background: none; padding: 0.5rem 1rem;">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
                     @else

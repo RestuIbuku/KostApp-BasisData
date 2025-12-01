@@ -39,7 +39,14 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-        return redirect('/home')->with('success', 'Registrasi berhasil');
+
+        $role = $user->role;
+        if ($role == 'pemilik') {
+            return redirect()->route('pemilik.dashboard')->with('success', 'Registrasi berhasil');
+        } elseif ($role == 'pencari') {
+            return redirect()->route('pencari.index')->with('success', 'Registrasi berhasil');
+        }
+        return redirect('/')->with('success', 'Registrasi berhasil');
     }
 
     public function login(Request $request)
@@ -50,7 +57,13 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            return redirect('/home')->with('success', 'Login berhasil');
+            $role = Auth::user()->role;
+            if ($role == 'pemilik') {
+                return redirect()->route('pemilik.dashboard')->with('success', 'Login berhasil');
+            } elseif ($role == 'pencari') {
+                return redirect()->route('pencari.index')->with('success', 'Login berhasil');
+            }
+            return redirect('/')->with('success', 'Login berhasil');
         }
 
         return back()->withErrors([

@@ -6,44 +6,44 @@
 <div class="container py-5">
     <h1 class="mb-4">Dashboard Pencari Kos</h1>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
     <!-- Statistik -->
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="glass-card text-center">
-                <h5>Total Booking</h5>
-                <h2 class="text-primary">{{ $bookings->count() }}</h2>
+                <h6 class="text-muted">Total Booking</h6>
+                <h2 class="text-primary">{{ $totalBookings }}</h2>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="glass-card text-center">
-                <h5>Booking Aktif</h5>
-                <h2 class="text-warning">{{ $bookings->where('status_booking', 'confirmed')->count() }}</h2>
+                <h6 class="text-muted">Dikonfirmasi</h6>
+                <h2 class="text-success">{{ $confirmedBookings }}</h2>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="glass-card text-center">
-                <h5>Total Ulasan</h5>
-                <h2 class="text-info">{{ $ulasan->count() }}</h2>
+                <h6 class="text-muted">Selesai</h6>
+                <h2 class="text-info">{{ $completedBookings }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card text-center">
+                <h6 class="text-muted">Ulasan Saya</h6>
+                <h2 class="text-warning">{{ $totalReviews }}</h2>
             </div>
         </div>
     </div>
 
     <!-- Riwayat Booking -->
     <div class="glass-card mb-4">
-        <h3 class="mb-3">Riwayat Booking</h3>
+        <h3 class="mb-3">Riwayat Booking Saya</h3>
         @if ($bookings->count() > 0)
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
                             <th>Kamar</th>
+                            <th>Kos</th>
                             <th>Tanggal Sewa</th>
                             <th>Total Harga</th>
                             <th>Status</th>
@@ -54,18 +54,23 @@
                         @foreach ($bookings as $booking)
                             <tr>
                                 <td><strong>{{ $booking->kamar->nama_kamar }}</strong></td>
+                                <td>{{ $booking->kamar->kos->nama_kos }}</td>
                                 <td>{{ \Carbon\Carbon::parse($booking->tgl_mulai_sewa)->format('d M Y') }} - {{ \Carbon\Carbon::parse($booking->tgl_selesai_sewa)->format('d M Y') }}</td>
                                 <td>Rp {{ number_format($booking->total_harga, 0, ',', '.') }}</td>
                                 <td>
-                                    <span class="badge bg-{{ $booking->status_booking == 'pending' ? 'warning' : ($booking->status_booking == 'confirmed' ? 'success' : 'info') }}">
+                                    <span class="badge bg-{{ $booking->status_booking == 'pending' ? 'warning' : ($booking->status_booking == 'confirmed' ? 'success' : ($booking->status_booking == 'completed' ? 'info' : 'danger')) }}">
                                         {{ ucfirst($booking->status_booking) }}
                                     </span>
                                 </td>
                                 <td>
                                     @if ($booking->status_booking == 'pending')
-                                        <a href="{{ route('pembayaran.create', $booking->booking_id) }}" class="btn btn-sm btn-primary">Bayar</a>
-                                    @elseif ($booking->status_booking == 'confirmed' && now() > $booking->tgl_selesai_sewa && !$booking->ulasan)
-                                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#ulasanModal{{ $booking->booking_id }}">Beri Ulasan</button>
+                                        <a href="{{ route('pencari.pembayaran.create', $booking->booking_id) }}" class="btn btn-sm btn-primary">Bayar</a>
+                                    @elseif ($booking->status_booking == 'confirmed' && now() > \Carbon\Carbon::parse($booking->tgl_selesai_sewa) && !$booking->ulasan)
+                                        <a href="{{ route('pencari.ulasan.create', $booking->booking_id) }}" class="btn btn-sm btn-warning">Beri Ulasan</a>
+                                    @elseif ($booking->status_booking == 'completed' && !$booking->ulasan)
+                                        <a href="{{ route('pencari.ulasan.create', $booking->booking_id) }}" class="btn btn-sm btn-warning">Beri Ulasan</a>
+                                    @elseif ($booking->ulasan)
+                                        <span class="badge bg-secondary">Sudah Diulas</span>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
@@ -75,6 +80,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-3">{{ $bookings->links() }}</div>
         @else
             <p class="text-muted">Anda belum memiliki booking.</p>
         @endif
@@ -85,15 +91,26 @@
         <h3 class="mb-3">Ulasan Saya</h3>
         @if ($ulasan->count() > 0)
             @foreach ($ulasan as $u)
-                <div class="card mb-3">
+                <div class="card mb-3 border-left border-warning">
                     <div class="card-body">
-                        <h5 class="card-title">{{ $u->kos->nama_kos }}</h5>
-                        <p class="card-text">
-                            <i class="fas fa-star" style="color: gold;"></i>
-                            <strong>Rating: {{ $u->rating }}/5</strong>
-                        </p>
-                        <p class="card-text">{{ $u->komentar }}</p>
-                        <small class="text-muted">{{ $u->tgl_ulasan->diffForHumans() }}</small>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title mb-1">{{ $u->kos->nama_kos }}</h5>
+                                <p class="mb-1">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star" style="color: {{ $i <= $u->rating ? '#ffc107' : '#ccc' }};"></i>
+                                    @endfor
+                                    <strong class="ms-2">{{ $u->rating }}/5</strong>
+                                </p>
+                                <p class="card-text">{{ $u->komentar }}</p>
+                                <small class="text-muted">{{ \Carbon\Carbon::parse($u->tgl_ulasan)->diffForHumans() }}</small>
+                            </div>
+                            <form method="POST" action="{{ route('pencari.ulasan.destroy', $u->ulasan_id) }}" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Hapus ulasan ini?')">Hapus</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             @endforeach

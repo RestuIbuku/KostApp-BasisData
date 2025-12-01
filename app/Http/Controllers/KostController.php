@@ -15,12 +15,12 @@ class KostController extends Controller
         $total_kosts = $kosts->count();
         $total_kamar_kosong = $kosts->sum('jumlah_kamar_kosong');
         $total_kamar_total = $kosts->sum('jumlah_kamar_total');
-        return view('kost.index', compact('kosts', 'total_kosts', 'total_kamar_kosong', 'total_kamar_total'));
+        return view('pemilik.kost.index', compact('kosts', 'total_kosts', 'total_kamar_kosong', 'total_kamar_total'));
     }
 
     public function create()
     {
-        return view('kost.create');
+        return view('pemilik.kost.create');
     }
 
     public function store(Request $request)
@@ -49,13 +49,13 @@ class KostController extends Controller
         // Simpan ke Database
         Kos::create($validatedData);
 
-        return redirect()->route('kost.index')->with('success', 'Kost berhasil ditambahkan');
+        return redirect()->route('pemilik.kos.index')->with('success', 'Kost berhasil ditambahkan');
     }
 
     // ... method edit, update, destroy biarkan tetap ada ...
     public function edit(Kos $kost)
     {
-        return view('kost.edit', compact('kost'));
+        return view('pemilik.kost.edit', compact('kost'));
     }
 
     public function update(Request $request, Kos $kost)
@@ -81,7 +81,7 @@ class KostController extends Controller
         }
 
         $kost->update($validatedData);
-        return redirect()->route('kost.index')->with('success', 'Kost berhasil diupdate');
+        return redirect()->route('pemilik.kos.index')->with('success', 'Kost berhasil diupdate');
     }
 
     public function destroy(Kos $kost)
@@ -90,6 +90,6 @@ class KostController extends Controller
             Storage::disk('public')->delete($kost->foto);
         }
         $kost->delete();
-        return redirect()->route('kost.index')->with('success', 'Kost berhasil dihapus');
+        return redirect()->route('pemilik.kos.index')->with('success', 'Kost berhasil dihapus');
     }
 }

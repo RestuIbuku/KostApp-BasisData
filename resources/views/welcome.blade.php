@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading... - Kost App</title>
-    
+
     {{-- Font Awesome & Google Fonts --}}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
@@ -82,7 +82,7 @@
             z-index: 1;
             animation: ripple-effect 2s infinite linear;
         }
-        
+
         .ripple:nth-child(2) {
             animation-delay: 0.5s;
         }
@@ -177,7 +177,7 @@
         // Waktu tunggu dalam milidetik (3000ms = 3 detik)
         setTimeout(function() {
             // Ganti 'login' dengan route tujuan kamu (misal: 'pencari.index' atau 'login')
-            window.location.href = "{{ route('login') }}"; 
+            window.location.href = "{{ route('login') }}";
         }, 3000);
     </script>
 

@@ -5,6 +5,15 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KostController;
 use App\Http\Controllers\PencariController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\UlasanController;
+use App\Http\Controllers\KamarController;
+use App\Http\Controllers\FotoKamarController;
+use App\Http\Controllers\FasilitasController;
+use App\Http\Controllers\PemilikController;
+use App\Http\Controllers\PemilikBookingController;
+use App\Http\Controllers\PemilikReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,106 +21,132 @@ use App\Http\Controllers\PencariController;
 |--------------------------------------------------------------------------
 */
 
+// ========== HALAMAN PUBLIK ==========
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Authentication Routes
+// ========== AUTHENTICATION ROUTES ==========
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Route Home (Pintu Pembagi Nasib)
+// ========== HOME ROUTE (Fallback untuk backward compatibility) ==========
 Route::get('/home', function () {
-    $role = Auth::user()->role;
-
-    if ($role == 'pemilik') {
-        // Calculate totals for pemilik dashboard
-        $total_kosts = \App\Models\Kos::where('pemilik_id', Auth::id())->count();
-        $total_kamar_kosong = \App\Models\Kos::where('pemilik_id', Auth::id())->sum('jumlah_kamar_kosong');
-        $total_kamar = \App\Models\Kos::where('pemilik_id', Auth::id())->sum('jumlah_kamar_total');
-        return view('home', compact('total_kosts', 'total_kamar_kosong', 'total_kamar')); // Dashboard Pemilik (View lama)
-    } elseif ($role == 'pencari') {
-        return redirect()->route('pencari.index'); // Lempar ke Katalog
+    if (!Auth::check()) {
+        return redirect('/login');
     }
-})->name('home');
 
-// Group Route khusus yang sudah Login
+    $role = Auth::user()->role;
+    if ($role == 'pemilik') {
+        return redirect()->route('pemilik.dashboard');
+    } elseif ($role == 'pencari') {
+        return redirect()->route('pencari.index');
+    }
+    return redirect('/');
+})->middleware('auth')->name('home');
+
+// ========== AUTHENTICATED ROUTES ==========
 Route::middleware(['auth'])->group(function () {
 
-    // Route Profil
+    // ===== PROFIL ROUTES =====
     Route::get('/profile', [AuthController::class, 'showProfile'])->name('profile');
     Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [AuthController::class, 'updatePassword'])->name('profile.updatePassword');
 
-    // Route buat Pemilik (CRUD Kost)
-    Route::resource('kost', KostController::class);
+    // ===== PENCARI ROUTES (JALUR PENCARI KOS) =====
+    Route::prefix('pencari')->name('pencari.')->group(function () {
+        // Katalog Kos
+        Route::get('/jelajah', [PencariController::class, 'index'])->name('index');
+        Route::get('/search', [PencariController::class, 'search'])->name('search');
+        Route::get('/kos/{id}', [PencariController::class, 'show'])->name('show');
 
-    // Route buat Pencari (Katalog & Detail)
-    Route::get('/jelajah', [PencariController::class, 'index'])->name('pencari.index');
-    Route::get('/jelajah/{id}', [PencariController::class, 'show'])->name('pencari.show');
-    Route::get('/pencari/dashboard', [PencariController::class, 'dashboard'])->name('pencari.dashboard');
+        // Dashboard Pencari
+        Route::get('/dashboard', [PencariController::class, 'dashboard'])->name('dashboard');
 
-    // Booking & Pembayaran untuk Pencari
-    Route::get('/booking/{kamar_id}', [\App\Http\Controllers\BookingController::class, 'create'])->name('booking.create');
-    Route::post('/booking', [\App\Http\Controllers\BookingController::class, 'store'])->name('booking.store');
+        // Booking
+        Route::get('/booking/{kamar_id}', [BookingController::class, 'create'])->name('booking.create');
+        Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
+        Route::get('/booking/check-availability', [BookingController::class, 'checkAvailability'])->name('booking.checkAvailability');
+        Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('bookings.my');
+        Route::post('/booking/{booking_id}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
 
-    Route::get('/booking/{booking_id}/bayar', [\App\Http\Controllers\PembayaranController::class, 'create'])->name('pembayaran.create');
-    Route::post('/booking/{booking_id}/bayar', [\App\Http\Controllers\PembayaranController::class, 'store'])->name('pembayaran.store');
+        // Pembayaran
+        Route::get('/booking/{booking_id}/bayar', [PembayaranController::class, 'create'])->name('pembayaran.create');
+        Route::post('/booking/{booking_id}/bayar', [PembayaranController::class, 'store'])->name('pembayaran.store');
+        Route::get('/booking/{booking_id}/confirmation', [PembayaranController::class, 'confirmation'])->name('pembayaran.confirmation');
 
-    // Ulasan
-    Route::post('/ulasan', [\App\Http\Controllers\UlasanController::class, 'store'])->name('ulasan.store');
+        // Ulasan
+        Route::get('/booking/{booking_id}/ulasan', [UlasanController::class, 'create'])->name('ulasan.create');
+        Route::post('/ulasan', [UlasanController::class, 'store'])->name('ulasan.store');
+        Route::get('/kos/{kos_id}/reviews', [UlasanController::class, 'kosReviews'])->name('reviews');
+        Route::delete('/ulasan/{ulasan_id}', [UlasanController::class, 'destroy'])->name('ulasan.destroy');
+    });
 
-    // Route untuk Kamar (nested dengan kost)
-    Route::get('/kost/{kos_id}/kamar', [\App\Http\Controllers\KamarController::class, 'index'])->name('pemilik.kamar.index');
-    Route::get('/kost/{kos_id}/kamar/create', [\App\Http\Controllers\KamarController::class, 'create'])->name('pemilik.kamar.create');
-    Route::post('/kost/{kos_id}/kamar', [\App\Http\Controllers\KamarController::class, 'store'])->name('pemilik.kamar.store');
-    Route::get('/kost/{kos_id}/kamar/{kamar_id}/edit', [\App\Http\Controllers\KamarController::class, 'edit'])->name('pemilik.kamar.edit');
-    Route::put('/kost/{kos_id}/kamar/{kamar_id}', [\App\Http\Controllers\KamarController::class, 'update'])->name('pemilik.kamar.update');
-    Route::delete('/kost/{kos_id}/kamar/{kamar_id}', [\App\Http\Controllers\KamarController::class, 'destroy'])->name('pemilik.kamar.destroy');
+    // ===== PEMILIK ROUTES (JALUR PEMILIK KOS) =====
+    Route::prefix('pemilik')->name('pemilik.')->middleware('auth')->group(function () {
+        // Dashboard Pemilik
+        Route::get('/dashboard', [PemilikController::class, 'dashboard'])->name('dashboard');
 
-    // Route untuk Foto Kamar
-    Route::post('/kost/{kos_id}/kamar/{kamar_id}/foto', [\App\Http\Controllers\FotoKamarController::class, 'store'])->name('pemilik.foto.store');
-    Route::delete('/foto/{foto_id}', [\App\Http\Controllers\FotoKamarController::class, 'destroy'])->name('pemilik.foto.destroy');
+        // CRUD Kos
+        Route::resource('kos', KostController::class);
 
-    // Route untuk Fasilitas Kos
-    Route::get('/kost/{kos_id}/fasilitas', [\App\Http\Controllers\FasilitasController::class, 'index'])->name('pemilik.fasilitas.index');
-    Route::post('/kost/{kos_id}/fasilitas/attach', [\App\Http\Controllers\FasilitasController::class, 'attach'])->name('pemilik.fasilitas.attach');
-    Route::delete('/kost/{kos_id}/fasilitas/{fasilitas_id}', [\App\Http\Controllers\FasilitasController::class, 'detach'])->name('pemilik.fasilitas.detach');
+        // Kamar Management (Nested routes)
+        Route::get('/kos/{kos_id}/kamar', [KamarController::class, 'index'])->name('kamar.index');
+        Route::get('/kos/{kos_id}/kamar/create', [KamarController::class, 'create'])->name('kamar.create');
+        Route::post('/kos/{kos_id}/kamar', [KamarController::class, 'store'])->name('kamar.store');
+        Route::get('/kos/{kos_id}/kamar/{kamar_id}/edit', [KamarController::class, 'edit'])->name('kamar.edit');
+        Route::put('/kos/{kos_id}/kamar/{kamar_id}', [KamarController::class, 'update'])->name('kamar.update');
+        Route::delete('/kos/{kos_id}/kamar/{kamar_id}', [KamarController::class, 'destroy'])->name('kamar.destroy');
+        Route::patch('/kamar/{kamar_id}/status', [KamarController::class, 'updateStatus'])->name('kamar.updateStatus');
+
+        // Foto Kamar Management
+        Route::post('/kos/{kos_id}/kamar/{kamar_id}/foto', [FotoKamarController::class, 'store'])->name('foto.store');
+        Route::delete('/foto/{foto_id}', [FotoKamarController::class, 'destroy'])->name('foto.destroy');
+
+        // Fasilitas Management
+        Route::get('/kos/{kos_id}/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas.index');
+        Route::post('/kos/{kos_id}/fasilitas/attach', [FasilitasController::class, 'attach'])->name('fasilitas.attach');
+        Route::delete('/kos/{kos_id}/fasilitas/{fasilitas_id}', [FasilitasController::class, 'detach'])->name('fasilitas.detach');
+
+        // Booking Management (Lihat booking masuk)
+        Route::get('/bookings', [\App\Http\Controllers\PemilikBookingController::class, 'index'])->name('bookings.index');
+        Route::get('/bookings/{booking_id}', [\App\Http\Controllers\PemilikBookingController::class, 'show'])->name('bookings.show');
+        Route::post('/bookings/{booking_id}/confirm', [\App\Http\Controllers\PemilikBookingController::class, 'confirm'])->name('bookings.confirm');
+        Route::post('/bookings/{booking_id}/reject', [\App\Http\Controllers\PemilikBookingController::class, 'reject'])->name('bookings.reject');
+
+        // Ulasan Management (Lihat ulasan)
+        Route::get('/reviews', [\App\Http\Controllers\PemilikReviewController::class, 'index'])->name('reviews.index');
+        Route::get('/reviews/{kos_id}', [\App\Http\Controllers\PemilikReviewController::class, 'show'])->name('reviews.show');
+
+        // Pembayaran Summary
+        Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
+    });
+
 });
-// ... kode route yang lain biarkan di atas ...
 
-// --- ALAT PENDETEKSI ERROR FOTO (Hapus nanti kalau udah beres) ---
+// ========== DEBUG ROUTES (Hapus setelah deploy) ==========
 Route::get('/cek-foto', function () {
-    // 1. Ambil data kost paling baru
     $kost = \App\Models\Kos::latest()->first();
-
     if(!$kost) {
         return "Belum ada data kost! Input dulu satu data baru sebagai Pemilik.";
     }
-
-    // 2. Cek apakah nama file tersimpan di database
     $namaFile = $kost->foto;
     if(!$namaFile) {
-        return "ERROR: Kolom foto di database KOSONG (NULL). Pastikan input data baru, jangan edit data lama.";
+        return "ERROR: Kolom foto di database KOSONG (NULL).";
     }
-
-    // 3. Cek apakah file fisiknya beneran ada di folder penyimpanan rahasia (storage/app/public)
     $pathAsli = storage_path('app/public/' . $namaFile);
     $fileAsliAda = file_exists($pathAsli);
-
-    // 4. Cek apakah 'Jalan Pintas' (symlink) di folder public sudah benar
     $pathPublic = public_path('storage/' . $namaFile);
     $linkAda = file_exists($pathPublic);
-
     return [
         'STATUS' => 'Laporan Detektif Foto',
         '1. Nama File di Database' => $namaFile,
         '2. Cek File di Folder Asli (Storage)' => $fileAsliAda ? 'ADA (Aman) ✅' : 'TIDAK ADA (Gawat) ❌',
         '3. Cek File di Folder Public (Link)' => $linkAda ? 'ADA (Aman) ✅' : 'TIDAK ADA (Link Putus) ❌',
         '4. Link URL yang dipakai' => asset('storage/' . $namaFile),
-        '5. Pesan untuk King' => (!$fileAsliAda) ? 'File tidak ter-upload. Cek folder storage/app/public/kost-images.' : ((!$linkAda) ? 'Masalah di storage:link. Hapus folder public/storage dan link ulang.' : 'Semua terlihat aman. Coba clear cache browser.')
+        '5. Pesan untuk King' => (!$fileAsliAda) ? 'File tidak ter-upload.' : ((!$linkAda) ? 'Masalah di storage:link.' : 'Semua aman.')
     ];
 });
