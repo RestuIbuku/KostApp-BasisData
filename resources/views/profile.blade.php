@@ -233,7 +233,14 @@
                                 <li><h6 class="dropdown-header text-muted">Akun Saya</h6></li>
                                 <li><a class="dropdown-item rounded-3" href="{{ route('profile') }}"><i class="fas fa-user me-2 text-primary"></i> Profil</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item rounded-3 text-danger" href="{{ route('logout') }}" onclick="return confirm('Logout sekarang?')"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item rounded-3 text-danger w-100 text-start" style="border: none; background: none; padding: 0.5rem 1rem;">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
                     @else
@@ -363,5 +370,15 @@
 
     {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Ensure Bootstrap dropdown is initialized
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+            dropdownElements.forEach(element => {
+                new bootstrap.Dropdown(element);
+            });
+        });
+    </script>
 </body>
 </html>

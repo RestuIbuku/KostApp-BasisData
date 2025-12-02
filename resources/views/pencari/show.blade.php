@@ -196,6 +196,60 @@
                                 </div>
                             </div>
 
+                            {{-- SECTION ULASAN --}}
+                            <hr class="my-5" style="opacity: 0.15;">
+
+                            <div class="mb-5">
+                                <div class="d-flex align-items-center justify-content-between mb-4">
+                                    <h5 class="section-title mb-0"><i class="fas fa-star text-warning"></i> Ulasan Pengguna</h5>
+                                    @auth
+                                    <a href="{{ route('pencari.reviews', $kost->kos_id) }}" class="btn btn-sm btn-primary-gradient">
+                                        <i class="fas fa-eye me-1"></i>Lihat Semua
+                                    </a>
+                                    @endauth
+                                </div>
+
+                                @if($kost->ulasan && count($kost->ulasan) > 0)
+                                    <div class="reviews-container">
+                                        @foreach($kost->ulasan->take(3) as $ulasan)
+                                            <div class="review-item mb-3 p-4" style="background: rgba(255,255,255,0.5); border-left: 4px solid #ffc107; border-radius: 12px;">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="fw-bold mb-1">{{ $ulasan->user->nama_lengkap }}</h6>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-calendar me-1"></i>
+                                                            {{ \Carbon\Carbon::parse($ulasan->tgl_ulasan)->diffForHumans() }}
+                                                        </small>
+                                                    </div>
+                                                    <div class="review-rating">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            <i class="fas fa-star{{ $i <= $ulasan->rating ? '' : ' far' }}" style="color: {{ $i <= $ulasan->rating ? '#ffc107' : '#ddd' }}; font-size: 0.9rem;"></i>
+                                                        @endfor
+                                                        <strong class="ms-2" style="font-size: 0.9rem;">{{ $ulasan->rating }}/5</strong>
+                                                    </div>
+                                                </div>
+                                                <p class="mb-0 text-dark" style="font-size: 0.95rem; line-height: 1.6;">
+                                                    {{ Str::limit($ulasan->komentar, 150) }}
+                                                </p>
+                                            </div>
+                                        @endforeach
+
+                                        @if($kost->ulasan->count() > 3)
+                                            <div class="text-center mt-4">
+                                                <a href="{{ route('pencari.reviews', $kost->kos_id) }}" class="btn btn-outline-custom">
+                                                    <i class="fas fa-arrow-right me-2"></i>Lihat {{ $kost->ulasan->count() }} Ulasan Lengkap
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-comment-slash" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
+                                        <p class="text-muted">Belum ada ulasan untuk kost ini. Jadilah yang pertama memberikan ulasan!</p>
+                                    </div>
+                                @endif
+                            </div>
+
                         </div>
                     </div>
 
